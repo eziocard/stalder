@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "682699350535",
+    "project_id": "stalder-60865",
+    "storage_bucket": "stalder-60865.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682699350535:android:4b2fcc257b355aec8340a2",
+        "android_client_info": {
+          "package_name": "com.andromeda.stalder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvjGNGmQvZ_rJqvfFCKkOGBDfC3Hvnoig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
