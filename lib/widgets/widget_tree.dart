@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 
 import 'package:stalder/models/Auth/auth.dart';
-import 'package:stalder/screens/home_page.dart';
-import 'package:stalder/screens/login_register_page.dart';
+import 'package:stalder/screens/dashboard/home_page.dart';
+import 'package:stalder/screens/login_page.dart';
 
 
 class WidgetTree extends StatefulWidget {
