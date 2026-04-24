@@ -67,17 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _goToRegisterButton() {
-    return TextButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const RegisterForm()),
-        );
-      },
-      child: const Text('¿No tienes cuenta? Regístrate'),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +83,6 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: 16.0),
             _submitButton(),
-            const SizedBox(height: 8.0),
-            _goToRegisterButton(),
             const SizedBox(height: 8.0),
             _errorMessage(),
           ],

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/components/boxSelector.dart';
 import 'package:stalder/screens/dashboard/attendance/attendance_screen.dart';
-import 'package:stalder/screens/dashboard/info_screen.dart';
+import 'package:stalder/screens/dashboard/personalinf/info_screen.dart';
+import 'package:stalder/screens/dashboard/studentinf/users_screen.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -25,7 +26,7 @@ class HomePage extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Boxselector(icon: Icons.people,backgroundColor: Colors.blue,color: Colors.white, onTap: (){print('informacon');})),
+            child: Boxselector(icon: Icons.people,backgroundColor: Colors.blue,color: Colors.white, onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => UserScreen())))),
              Padding(
   padding: const EdgeInsets.all(12),
   child: Row(
