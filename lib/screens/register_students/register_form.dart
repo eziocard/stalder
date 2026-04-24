@@ -1,6 +1,7 @@
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:stalder/models/Auth/auth.dart';
+import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/screens/components/entryfield.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -12,6 +13,8 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
+  final _userRepository = UserRepository();
+  final User? firebaseUser = Auth().currentUser;
 
   final TextEditingController _controllerName = TextEditingController();
   final TextEditingController _controllerLastname = TextEditingController();
@@ -19,61 +22,9 @@ class _RegisterFormState extends State<RegisterForm> {
   final TextEditingController _controllerContactEmergency = TextEditingController();
   final TextEditingController _controllerEmail = TextEditingController();
 
-  String? _selectedValue = 'Male';
-  int? _selectedValueDropdown;
-
-  Future<void> onSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final url = Uri.parse("http://10.0.2.2:8000/api/users/");
-        // 👆 Android emulator
-
-        final response = await http.post(
-          url,
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode({
-            "name": _controllerName.text,
-            "last_name": _controllerLastname.text,
-            "contact_number": _controllerContactNumber.text,
-            "emergency_contact_number": _controllerContactEmergency.text,
-            "email": _controllerEmail.text,
-            "gender": _selectedValue,
-            "role": _selectedValueDropdown,
-          }),
-        );
-
-        if (response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Usuario creado. Revisa tu email"),
-            ),
-          );
-
-          // limpiar formulario
-          _formKey.currentState!.reset();
-          setState(() {
-            _selectedValue = 'Male';
-            _selectedValueDropdown = null;
-          });
-
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Error: ${response.body}"),
-            ),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error de conexión: $e"),
-          ),
-        );
-      }
-    }
-  }
-
-
+  String? _selectedGender = 'Male';
+  int? _selectedRoleId;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -85,77 +36,118 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
+  Future<void> onSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final token = await firebaseUser?.getIdToken();
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error de autenticación')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final success = await _userRepository.createUser(token, {
+      "name": _controllerName.text,
+      "last_name": _controllerLastname.text,
+      "contact_number": _controllerContactNumber.text,
+      "emergency_contact_number": _controllerContactEmergency.text,
+      "email": _controllerEmail.text,
+      "gender": _selectedGender,
+      "role": _selectedRoleId,
+    });
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario creado. Revisa tu email')),
+      );
+      _formKey.currentState!.reset();
+      setState(() {
+        _selectedGender = 'Male';
+        _selectedRoleId = null;
+      });
+      Navigator.pop(context); // vuelve a la lista y recarga
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al crear el usuario')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Register'),
-      ),
+      appBar: AppBar(title: const Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
-              children: <Widget>[
+              children: [
                 Entryfield(title: 'Name', controller: _controllerName),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
                 Entryfield(title: 'Lastname', controller: _controllerLastname),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
                 Entryfield(title: 'Contact Number', controller: _controllerContactNumber),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
                 Entryfield(title: 'Contact Emergency', controller: _controllerContactEmergency),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
                 Entryfield(title: 'Email', controller: _controllerEmail),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
 
                 // Gender
-                RadioGroup<String>(
-                  groupValue: _selectedValue,
-                  onChanged: (value) => setState(() => _selectedValue = value),
-                  child: Column(
-                    children: const [
-                      RadioListTile<String>(
-                        title: Text('Male'),
-                        value: 'Male',
-                      ),
-                      RadioListTile<String>(
-                        title: Text('Female'),
-                        value: 'Female',
-                      ),
-                    ],
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.w500)),
+                    RadioListTile<String>(
+                      title: const Text('Male'),
+                      value: 'Male',
+                      groupValue: _selectedGender,
+                      onChanged: (value) => setState(() => _selectedGender = value),
+                    ),
+                    RadioListTile<String>(
+                      title: const Text('Female'),
+                      value: 'Female',
+                      groupValue: _selectedGender,
+                      onChanged: (value) => setState(() => _selectedGender = value),
+                    ),
+                  ],
                 ),
 
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 16),
 
-                // Role dropdown
+                // Role dropdown - hardcodeado igual que antes
                 DropdownButtonFormField<int>(
-                  initialValue: _selectedValueDropdown,
+                  value: _selectedRoleId,
                   hint: const Text('Choose a role'),
                   items: const [
                     DropdownMenuItem(value: 1, child: Text('Student')),
                     DropdownMenuItem(value: 2, child: Text('Coach')),
                     DropdownMenuItem(value: 3, child: Text('Admin')),
                   ],
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedValueDropdown = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) return 'Role is required';
-                    return null;
-                  },
+                  onChanged: (value) => setState(() => _selectedRoleId = value),
+                  validator: (value) => value == null ? 'Role is required' : null,
                 ),
 
-                const SizedBox(height: 24.0),
+                const SizedBox(height: 24),
 
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: onSubmit,
-                    child: const Text('Register'),
+                    onPressed: _isLoading ? null : onSubmit,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Register'),
                   ),
                 ),
               ],

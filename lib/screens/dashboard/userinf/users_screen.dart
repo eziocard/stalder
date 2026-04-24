@@ -6,7 +6,7 @@ import 'package:stalder/models/Role/role.dart';
 import 'package:stalder/models/Role/role_repository.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
-import 'package:stalder/screens/dashboard/studentinf/manage_user.dart';
+import 'package:stalder/screens/dashboard/userinf/manage_user.dart';
 import 'package:stalder/screens/register_students/register_form.dart';
 
 class UserScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _UserScreenState extends State<UserScreen> {
   Future<List<UserDetail>?>? _userFuture;
   List<Role> _roles = [];
   String _searchText = '';
-  int? _selectedRoleId; // null = todos los roles
+  int? _selectedRoleId; 
 
   @override
   void initState() {
@@ -71,7 +71,7 @@ class _UserScreenState extends State<UserScreen> {
             ),
           ),
 
-          // Filtro por roles
+          
           if (_roles.isNotEmpty)
             SizedBox(
               height: 44,
@@ -79,7 +79,7 @@ class _UserScreenState extends State<UserScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  // Chip "Todos"
+                  
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
@@ -124,7 +124,7 @@ class _UserScreenState extends State<UserScreen> {
                   return const Center(child: Text('No hay usuarios'));
                 }
 
-                // Filtro por búsqueda + rol
+                
                 final users = snapshot.data!.where((u) {
                   final matchesSearch =
                       u.name.toLowerCase().contains(_searchText.toLowerCase()) ||
