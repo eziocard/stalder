@@ -51,6 +51,22 @@ class UserRepository {
     return null;
   }
 
+  Future<List<UserDetail>?> fetchTeachers(String token) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/users/'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      var decodedJson = jsonDecode(response.body) as List;
+      final users = decodedJson.map((item) => UserDetail.fromJson(item)).toList();
+      return users.where((u) => u.roleName == 'Coach').toList();
+    }
+    return null;
+  }
+
   // ← NUEVO
   Future<bool> createUser(String token, Map<String, dynamic> fields) async {
     final response = await http.post(

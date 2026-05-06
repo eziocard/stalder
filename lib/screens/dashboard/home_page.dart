@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/components/boxSelector.dart';
 import 'package:stalder/screens/dashboard/attendance/attendance_screen.dart';
+import 'package:stalder/screens/dashboard/level/level_screen.dart';
 import 'package:stalder/screens/dashboard/personalinf/info_screen.dart';
 import 'package:stalder/screens/dashboard/userinf/users_screen.dart';
 
@@ -51,6 +52,10 @@ class HomePage extends StatelessWidget {
     ],
   ),
 ),
+  Padding(
+    padding: const EdgeInsets.all(12),
+    child: Boxselector(icon: Icons.analytics, onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => LevelScreen())), color: Colors.white, backgroundColor:Colors.green),
+  ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Boxselector(icon: Icons.logout,backgroundColor: Colors.red,color: Colors.white, onTap: () async => await signOut()) ),
