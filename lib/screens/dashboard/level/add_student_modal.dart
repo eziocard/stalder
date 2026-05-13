@@ -73,7 +73,7 @@ class _AddStudentModalState extends State<AddStudentModal> {
           TextField(
             decoration: InputDecoration(
               labelText: 'Buscar alumno',
-              hintText: 'Ej: Juan Pérez',
+              hintText: 'Ej: Flavio jara',
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),

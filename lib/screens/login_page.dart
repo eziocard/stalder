@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             Entryfield(title: 'Email', controller: _controllerEmail),
             const SizedBox(height: 16.0),
-            Entryfield(title: 'Password', controller: _controllerPassword, isPassword: true),
+            Entryfield(title: 'Contraseña', controller: _controllerPassword, isPassword: true),
 
             const SizedBox(height: 16.0),
             _submitButton(),

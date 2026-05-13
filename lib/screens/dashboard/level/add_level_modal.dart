@@ -53,11 +53,11 @@ class _AddLevelModalState extends State<AddLevelModal> {
       setState(() => _selectedTeacher = null);
       Navigator.pop(context, true); 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nivel creado correctamente')),
+        const SnackBar(content: Text('grupo creado correctamente')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al crear el nivel')),
+        const SnackBar(content: Text('Error al crear el grupo')),
       );
     }
   }

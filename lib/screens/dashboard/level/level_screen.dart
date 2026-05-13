@@ -73,11 +73,11 @@ class _LevelScreenState extends State<LevelScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage Levels')),
+      appBar: AppBar(title: const Text('Manejo de Grupos')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _levels.isEmpty
-              ? const Center(child: Text('No hay niveles registrados'))
+              ? const Center(child: Text('No hay Grupos registrados'))
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   itemCount: _levels.length,

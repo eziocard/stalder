@@ -81,7 +81,7 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: const Text('Registrar')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -89,13 +89,13 @@ class _RegisterFormState extends State<RegisterForm> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Entryfield(title: 'Name', controller: _controllerName),
+                Entryfield(title: 'Nombre', controller: _controllerName),
                 const SizedBox(height: 16),
-                Entryfield(title: 'Lastname', controller: _controllerLastname),
+                Entryfield(title: 'Apellido', controller: _controllerLastname),
                 const SizedBox(height: 16),
-                Entryfield(title: 'Contact Number', controller: _controllerContactNumber),
+                Entryfield(title: 'Número de Contacto', controller: _controllerContactNumber),
                 const SizedBox(height: 16),
-                Entryfield(title: 'Contact Emergency', controller: _controllerContactEmergency),
+                Entryfield(title: 'Contacto de Emergencia', controller: _controllerContactEmergency),
                 const SizedBox(height: 16),
                 Entryfield(title: 'Email', controller: _controllerEmail),
                 const SizedBox(height: 16),
@@ -104,15 +104,15 @@ class _RegisterFormState extends State<RegisterForm> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.w500)),
+                    const Text('Género', style: TextStyle(fontWeight: FontWeight.w500)),
                     RadioListTile<String>(
-                      title: const Text('Male'),
+                      title: const Text('Hombre'),
                       value: 'Male',
                       groupValue: _selectedGender,
                       onChanged: (value) => setState(() => _selectedGender = value),
                     ),
                     RadioListTile<String>(
-                      title: const Text('Female'),
+                      title: const Text('Mujer'),
                       value: 'Female',
                       groupValue: _selectedGender,
                       onChanged: (value) => setState(() => _selectedGender = value),
@@ -125,14 +125,14 @@ class _RegisterFormState extends State<RegisterForm> {
                 // Role dropdown - hardcodeado igual que antes
                 DropdownButtonFormField<int>(
                   value: _selectedRoleId,
-                  hint: const Text('Choose a role'),
+                  hint: const Text('Elige un rol'),
                   items: const [
-                    DropdownMenuItem(value: 1, child: Text('Student')),
-                    DropdownMenuItem(value: 2, child: Text('Coach')),
-                    DropdownMenuItem(value: 3, child: Text('Admin')),
+                    DropdownMenuItem(value: 1, child: Text('Alumno')),
+                    DropdownMenuItem(value: 2, child: Text('Entrenador')),
+                    DropdownMenuItem(value: 3, child: Text('Administrador')),
                   ],
                   onChanged: (value) => setState(() => _selectedRoleId = value),
-                  validator: (value) => value == null ? 'Role is required' : null,
+                  validator: (value) => value == null ? 'El rol es requerido' : null,
                 ),
 
                 const SizedBox(height: 24),
@@ -147,7 +147,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Register'),
+                        : const Text('Registrar'),
                   ),
                 ),
               ],

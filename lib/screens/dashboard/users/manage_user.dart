@@ -78,7 +78,7 @@ class _ManageUserState extends State<ManageUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage Users')),
+      appBar: AppBar(title: const Text('Menu de usuarios')),
      
       body: Padding(
         padding: const EdgeInsets.all(16),

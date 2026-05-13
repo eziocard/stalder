@@ -53,7 +53,7 @@ class _UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Users Information')),
+      appBar: AppBar(title: const Text('Información de usuarios')),
       body: Column(
         children: [
           // Buscador
@@ -61,7 +61,7 @@ class _UserScreenState extends State<UserScreen> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
               decoration: const InputDecoration(
-                labelText: 'Search Users',
+                labelText: 'Buscar usuarios',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(),
               ),

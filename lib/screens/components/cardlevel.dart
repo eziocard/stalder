@@ -19,7 +19,7 @@ class Cardlevel extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias, // ← necesario para que InkWell respete el borde redondeado
+      clipBehavior: Clip.antiAlias, 
       child: InkWell(
         onTap: onTap,
         child: Padding(

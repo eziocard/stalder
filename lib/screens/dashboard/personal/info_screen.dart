@@ -25,7 +25,7 @@ class _InfoScreenState extends State<InfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Personal Information'),
+        title: const Text('Información Personal'),
         ),
         body: FutureBuilder<UserDetail?>(
         future: _fetchUserDetail(),
