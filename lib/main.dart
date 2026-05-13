@@ -15,7 +15,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Auth App',
+      title: 'Stalder',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const WidgetTree(),
     );

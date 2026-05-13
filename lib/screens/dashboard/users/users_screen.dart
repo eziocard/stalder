@@ -6,7 +6,7 @@ import 'package:stalder/models/Role/role.dart';
 import 'package:stalder/models/Role/role_repository.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
-import 'package:stalder/screens/dashboard/userinf/manage_user.dart';
+import 'package:stalder/screens/dashboard/users/manage_user.dart';
 import 'package:stalder/screens/register_students/register_form.dart';
 
 class UserScreen extends StatefulWidget {

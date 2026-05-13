@@ -1,8 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-
 import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/dashboard/home_page.dart';
 import 'package:stalder/screens/login_page.dart';

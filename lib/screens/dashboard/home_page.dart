@@ -4,8 +4,8 @@ import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/components/boxSelector.dart';
 import 'package:stalder/screens/dashboard/attendance/attendance_screen.dart';
 import 'package:stalder/screens/dashboard/level/level_screen.dart';
-import 'package:stalder/screens/dashboard/personalinf/info_screen.dart';
-import 'package:stalder/screens/dashboard/userinf/users_screen.dart';
+import 'package:stalder/screens/dashboard/personal/info_screen.dart';
+import 'package:stalder/screens/dashboard/users/users_screen.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});

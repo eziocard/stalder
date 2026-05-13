@@ -51,7 +51,7 @@ class _AddLevelModalState extends State<AddLevelModal> {
     if (success) {
       widget.titleController.clear();
       setState(() => _selectedTeacher = null);
-      Navigator.pop(context, true); // ← avisa a LevelScreen que recargue
+      Navigator.pop(context, true); 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nivel creado correctamente')),
       );

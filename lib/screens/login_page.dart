@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/components/entryfield.dart';
-import 'package:stalder/screens/register_students/register_form.dart';
+
 
 // 👇 CREA ESTA PANTALLA (ejemplo básico)
 
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       _controllerEmail.text,
       _controllerPassword.text,
     );
-    // ✅ Sin Navigator aquí — WidgetTree redirige solo
+    
 
   } on FirebaseAuthException catch (e) {
     if (mounted) setState(() { errorMessage = e.message; });
