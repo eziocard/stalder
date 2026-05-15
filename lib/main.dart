@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'widgets/widget_tree.dart';
 
 Future<void> main() async {
@@ -18,6 +19,14 @@ class MainApp extends StatelessWidget {
       title: 'Stalder',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const WidgetTree(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'CL'), 
+      ],
     );
   }
 }
