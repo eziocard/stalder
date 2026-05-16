@@ -23,46 +23,74 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Dashboard'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Boxselector(icon: Icons.people,backgroundColor: Colors.blue,color: Colors.white, onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => UserScreen())))),
-             Padding(
-  padding: const EdgeInsets.all(12),
-  child: Row(
+      body: SingleChildScrollView(
+  child: Column(
     children: [
-      Expanded(
+      Padding(
+        padding: const EdgeInsets.all(12),
         child: Boxselector(
-          icon: Icons.list,
-          onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => AttendanceScreen())),
+          icon: Icons.people,
+          backgroundColor: Colors.blue,
           color: Colors.white,
-          backgroundColor: Colors.orange,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen())),
         ),
       ),
-      const SizedBox(width: 12), // espacio entre los dos
-      Expanded(
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Boxselector(
+                icon: Icons.list,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AttendanceScreen())),
+                color: Colors.white,
+                backgroundColor: Colors.orange,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Boxselector(
+                icon: Icons.info,
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => InfoScreen())),
+                color: Colors.white,
+                backgroundColor: Colors.orange,
+              ),
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(12),
         child: Boxselector(
-          icon: Icons.info,
-          onTap:() => Navigator.push(context,MaterialPageRoute(builder: (context) => InfoScreen())),
+          icon: Icons.analytics,
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LevelScreen())),
           color: Colors.white,
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.green,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: Boxselector(
+          icon: Icons.logout,
+          backgroundColor: Colors.red,
+          color: Colors.white,
+          onTap: () async => await signOut(),
         ),
       ),
     ],
   ),
 ),
-  Padding(
-    padding: const EdgeInsets.all(12),
-    child: Boxselector(icon: Icons.analytics, onTap: () => Navigator.push(context,MaterialPageRoute(builder: (context) => LevelScreen())), color: Colors.white, backgroundColor:Colors.green),
-  ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Boxselector(icon: Icons.logout,backgroundColor: Colors.red,color: Colors.white, onTap: () async => await signOut()) ),
-          
-         
-        ],
-      )
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Información'),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Inicio'
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings),label: 'Configuración'),
+
+        ]) ,
     );
   }
 
