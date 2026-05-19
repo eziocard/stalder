@@ -205,7 +205,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
                 Container(
                   padding: const EdgeInsets.all(16),
-                  color: const Color.fromARGB(125, 11, 127, 162),
+                  color: Theme.of(context).colorScheme.primary,
                   child: Column(
                     children: [
                       // Fecha

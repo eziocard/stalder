@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:stalder/themes/app_theme.dart';
 import 'widgets/widget_tree.dart';
 
 Future<void> main() async {
@@ -9,24 +10,37 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  static _MainAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MainAppState>()!;
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  ThemeMode get themeMode => _themeMode;
+
+  void changeTheme(bool isDark) {
+    setState(() {
+      _themeMode = isDark
+          ? ThemeMode.dark
+          : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Stalder',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: _themeMode,
       home: const WidgetTree(),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('es', 'CL'), 
-      ],
     );
   }
 }

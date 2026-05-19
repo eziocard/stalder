@@ -17,15 +17,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final User? user = Auth().currentUser;
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   Future<void> signOut() async {
     await Auth().signOut();
   }
 
   // ← cada índice es una vista distinta
-  late final List<Widget> _screens = [
-    InfoScreen(),                
+  late final List<Widget> _screens = [               
     _buildHomeBody(),            
     SettingsScreen(), 
   ];
@@ -40,7 +39,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(12),
               child: Boxselector(
                 icon: Icons.people,
-                backgroundColor: Colors.blue,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 color: Colors.white,
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen())),
               ),
@@ -101,7 +100,6 @@ class _HomePageState extends State<HomePage> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index), // ← cambia el tab
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Información'),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configuración'),
         ],
