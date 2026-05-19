@@ -59,24 +59,16 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Boxselector(
-                      icon: Icons.info,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => InfoScreen())),
+                      icon:  Icons.analytics,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LevelScreen())),
                       color: Colors.white,
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Colors.green,
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Boxselector(
-                icon: Icons.analytics,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LevelScreen())),
-                color: Colors.white,
-                backgroundColor: Colors.green,
-              ),
-            ),
+           
             Padding(
               padding: const EdgeInsets.all(12),
               child: Boxselector(

@@ -23,11 +23,11 @@ class UserDetail {
   factory UserDetail.fromJson(Map<String, dynamic> json) {
     return UserDetail(
     id:json['id'],
-    firebaseId: json['firebase_uid'] ?? '',           // 👈 era 'firebaseId'
+    firebaseId: json['firebase_uid'] ?? '',          
     name: json['name'] ?? '',
-    lastname: json['last_name'] ?? '',                // 👈 era 'lastname'
-    contactNumber: json['contact_number'] ?? '',      // 👈 era 'contactNumber'
-    emergencyContactNumber: json['emergency_contact_number'] ?? '', // 👈 corregido
+    lastname: json['last_name'] ?? '',                
+    contactNumber: json['contact_number'] ?? '',    
+    emergencyContactNumber: json['emergency_contact_number'] ?? '',
     gender: json['gender'] ?? '',
     email: json['email'] ?? '',
     roleName: json['role_name'] ?? '', 
