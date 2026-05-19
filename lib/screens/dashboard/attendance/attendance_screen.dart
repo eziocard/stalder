@@ -78,7 +78,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       }
       setState(() => _isEditing = true);
     } else {
-      // Por defecto todos presentes
+  
       for (final s in students ?? []) {
         attendanceMap[s.studentId] = 'absent';
       }

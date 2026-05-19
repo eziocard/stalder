@@ -89,7 +89,7 @@ class _LevelScreenState extends State<LevelScreen> {
     MaterialPageRoute(
       builder: (_) => LevelInfoScreen(level: _levels[index]),
     ),
-  ).then((_) => _loadData()), // recarga al volver
+  ).then((_) => _loadData()), 
 );
                   },
                 ),

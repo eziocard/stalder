@@ -62,7 +62,7 @@ class UserRepository {
     if (response.statusCode == 200) {
       var decodedJson = jsonDecode(response.body) as List;
       final users = decodedJson.map((item) => UserDetail.fromJson(item)).toList();
-      return users.where((u) => u.roleName == 'Coach').toList();
+      return users.where((u) => u.roleName == 'Entrenador').toList();
     }
     return null;
   }

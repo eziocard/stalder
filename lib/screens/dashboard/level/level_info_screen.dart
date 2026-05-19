@@ -41,7 +41,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
 
     final enrolledIds = students?.map((s) => s.studentId).toSet() ?? {};
     final available = allUsers
-            ?.where((u) => u.roleName == 'Student' && !enrolledIds.contains(u.id))
+            ?.where((u) => u.roleName == 'Alumno' && !enrolledIds.contains(u.id))
             .toList() ??
         [];
     if (!mounted) return;
