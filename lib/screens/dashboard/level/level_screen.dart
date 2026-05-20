@@ -10,7 +10,9 @@ import 'package:stalder/screens/dashboard/level/add_level_modal.dart';
 import 'package:stalder/screens/dashboard/level/level_info_screen.dart';
 
 class LevelScreen extends StatefulWidget {
-  const LevelScreen({super.key});
+  final UserDetail? currentUser; // ← recibe el usuario actual
+
+  const LevelScreen({super.key, this.currentUser});
 
   @override
   State<LevelScreen> createState() => _LevelScreenState();
@@ -26,6 +28,8 @@ class _LevelScreenState extends State<LevelScreen> {
   List<LevelDetail> _levels = [];
   List<UserDetail> _teachers = [];
   bool _isLoading = true;
+
+  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
 
   @override
   void initState() {
@@ -45,9 +49,19 @@ class _LevelScreenState extends State<LevelScreen> {
 
     final levels = await _levelRepository.fetchLevels(token);
     final teachers = await _userRepository.fetchTeachers(token);
+
     if (!mounted) return;
+
+    // Si es Coach filtra solo sus niveles
+    List<LevelDetail> filteredLevels = levels ?? [];
+    if (!_isAdmin && widget.currentUser != null) {
+      filteredLevels = filteredLevels.where((l) =>
+        l.teacherId == widget.currentUser!.id
+      ).toList();
+    }
+
     setState(() {
-      _levels = levels ?? [];
+      _levels = filteredLevels;
       _teachers = teachers ?? [];
       _isLoading = false;
     });
@@ -66,7 +80,7 @@ class _LevelScreenState extends State<LevelScreen> {
         teachers: _teachers,
       ),
     ).then((created) {
-      if (created == true) _loadData(); // recarga la lista al crear
+      if (created == true) _loadData();
     });
   }
 
@@ -83,20 +97,24 @@ class _LevelScreenState extends State<LevelScreen> {
                   itemCount: _levels.length,
                   itemBuilder: (context, index) {
                     return Cardlevel(
-  level: _levels[index],
-  onTap: () => Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => LevelInfoScreen(level: _levels[index]),
-    ),
-  ).then((_) => _loadData()), 
-);
+                      level: _levels[index],
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => LevelInfoScreen(level: _levels[index],currentUser: widget.currentUser,),
+                        ),
+                      ).then((_) => _loadData()),
+                    );
                   },
                 ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddLevelModal,
-        child: const Icon(Icons.add),
-      ),
+
+   
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              onPressed: _showAddLevelModal,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

@@ -10,8 +10,13 @@ import 'package:stalder/screens/dashboard/level/add_student_modal.dart';
 
 class LevelInfoScreen extends StatefulWidget {
   final LevelDetail level;
+  final UserDetail? currentUser; // ← agrega esto
 
-  const LevelInfoScreen({super.key, required this.level});
+  const LevelInfoScreen({
+    super.key,
+    required this.level,
+    this.currentUser,
+  });
 
   @override
   State<LevelInfoScreen> createState() => _LevelInfoScreenState();
@@ -25,6 +30,9 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   List<StudentLevel> _students = [];
   List<UserDetail> _availableStudents = [];
   bool _isLoading = true;
+
+  // ← helper de rol
+  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
 
   @override
   void initState() {
@@ -44,6 +52,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
             ?.where((u) => u.roleName == 'Alumno' && !enrolledIds.contains(u.id))
             .toList() ??
         [];
+
     if (!mounted) return;
     setState(() {
       _students = students ?? [];
@@ -146,29 +155,41 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                               ),
                               title: Text('${s.studentName} ${s.studentLastname}'),
                               subtitle: Text(s.studentEmail),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                                onPressed: () async {
-                                  final token = await firebaseUser?.getIdToken();
-                                  if (token == null) return;
-                                  final success = await _levelRepository.removeStudentFromLevel(
-                                    token,
-                                    widget.level.id,
-                                    s.studentId,
-                                  );
-                                  if (success) _loadData();
-                                },
-                              ),
+
+                              // ← solo Admin ve el botón de quitar
+                              trailing: _isAdmin
+                                  ? IconButton(
+                                      icon: const Icon(
+                                        Icons.remove_circle_outline,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () async {
+                                        final token = await firebaseUser?.getIdToken();
+                                        if (token == null) return;
+                                        final success = await _levelRepository
+                                            .removeStudentFromLevel(
+                                          token,
+                                          widget.level.id,
+                                          s.studentId,
+                                        );
+                                        if (success) _loadData();
+                                      },
+                                    )
+                                  : null,
                             );
                           },
                         ),
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddStudentModal,
-        child: const Icon(Icons.add),
-      ),
+
+      // ← solo Admin ve el FAB para agregar alumnos
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              onPressed: _showAddStudentModal,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

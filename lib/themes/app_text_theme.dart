@@ -10,7 +10,7 @@ class AppTextTheme {
 
     titleLarge: GoogleFonts.oswald(
       fontSize: 30,
-      fontStyle: FontStyle.italic,
+      fontStyle: FontStyle.normal,
     ),
 
     bodyMedium: GoogleFonts.merriweather(),

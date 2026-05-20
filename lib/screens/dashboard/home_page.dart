@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:stalder/models/Auth/auth.dart';
+import 'package:stalder/models/User/repository/user_repository.dart';
+import 'package:stalder/models/User/user_detail.dart';
 import 'package:stalder/screens/components/boxSelector.dart';
 import 'package:stalder/screens/dashboard/attendance/attendance_screen.dart';
 import 'package:stalder/screens/dashboard/level/level_screen.dart';
-import 'package:stalder/screens/dashboard/personal/info_screen.dart';
 import 'package:stalder/screens/dashboard/settings/settings_screen.dart';
 import 'package:stalder/screens/dashboard/users/users_screen.dart';
 
@@ -16,59 +17,102 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final User? user = Auth().currentUser;
+  final User? firebaseUser = Auth().currentUser;
+  final _userRepository = UserRepository();
+
   int _currentIndex = 0;
+  UserDetail? _currentUser;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final token = await firebaseUser?.getIdToken();
+    if (token == null) return;
+    final user = await _userRepository.fetchUserDetail(token);
+    if (!mounted) return;
+    setState(() {
+      _currentUser = user;
+      _isLoading = false;
+    });
+  }
 
   Future<void> signOut() async {
     await Auth().signOut();
   }
 
-  // ← cada índice es una vista distinta
-  late final List<Widget> _screens = [               
-    _buildHomeBody(),            
-    SettingsScreen(), 
+  bool get _isAdmin => _currentUser?.roleName == 'Administrador';
+  bool get _isCoach => _currentUser?.roleName == 'Entrenador';
+
+  late final List<Widget> _screens = [
+    _buildHomeBody(),
+    SettingsScreen(),
   ];
 
   Widget _buildHomeBody() {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard')),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Boxselector(
-                icon: Icons.people,
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                color: Colors.white,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserScreen())),
+   
+            if (_isAdmin)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Boxselector(
+                  icon: Icons.people,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  color: Colors.white,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => UserScreen()),
+                  ),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Boxselector(
-                      icon: Icons.list,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AttendanceScreen())),
-                      color: Colors.white,
-                      backgroundColor: Colors.orange,
+
+            // Admin y Coach pueden pasar asistencia
+            if (_isAdmin || _isCoach)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Boxselector(
+                  icon: Icons.list,
+                  color: Colors.white,
+                  backgroundColor: Colors.orange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AttendanceScreen(currentUser: _currentUser)),
+                  ),
+                ),
+              ),
+
+            // Admin ve todos los niveles, Coach ve solo los suyos
+            if (_isAdmin || _isCoach)
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Boxselector(
+                  icon: Icons.analytics,
+                  color: Colors.white,
+                  backgroundColor: Colors.green,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LevelScreen(currentUser: _currentUser),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Boxselector(
-                      icon:  Icons.analytics,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LevelScreen())),
-                      color: Colors.white,
-                      backgroundColor: Colors.green,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-           
+
+            // Logout siempre visible
             Padding(
               padding: const EdgeInsets.all(12),
               child: Boxselector(
@@ -87,10 +131,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex], // ← muestra la vista del tab activo
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index), // ← cambia el tab
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Configuración'),

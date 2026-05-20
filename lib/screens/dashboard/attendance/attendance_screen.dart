@@ -5,10 +5,13 @@ import 'package:stalder/models/Level/level_detail.dart';
 import 'package:stalder/models/Level/level_repository.dart';
 import 'package:stalder/models/Role/StudentLevel.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
+import 'package:stalder/models/User/user_detail.dart';
 import 'package:stalder/models/attendance/attendance_repository.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({super.key});
+  final UserDetail? currentUser; // ← agrega esto
+
+  const AttendanceScreen({super.key, this.currentUser});
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -23,12 +26,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   List<LevelDetail> _levels = [];
   LevelDetail? _selectedLevel;
   List<StudentLevel> _students = [];
-  Map<int, String> _attendanceMap = {}; 
+  Map<int, String> _attendanceMap = {};
   bool _isLoadingLevels = true;
   bool _isLoadingStudents = false;
   bool _isSaving = false;
-  bool _isEditing = false; // ← modo edición
+  bool _isEditing = false;
   DateTime _selectedDate = DateTime.now();
+
+  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
 
   final List<Map<String, dynamic>> _statusOptions = [
     {'value': 'present',   'label': 'Presente',    'color': Colors.green,  'icon': Icons.check_circle},
@@ -50,8 +55,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     final levels = await _levelRepository.fetchLevels(token);
 
     if (!mounted) return;
+
+    // Si es Coach filtra solo sus niveles
+    List<LevelDetail> filteredLevels = levels ?? [];
+    if (!_isAdmin && widget.currentUser != null) {
+      filteredLevels = filteredLevels
+          .where((l) => l.teacherId == widget.currentUser!.id)
+          .toList();
+    }
+
     setState(() {
-      _levels = levels ?? [];
+      _levels = filteredLevels;
       _isLoadingLevels = false;
     });
   }
@@ -63,14 +77,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     if (token == null) return;
 
     final students = await _levelRepository.fetchStudentsByLevel(token, levelId);
-
-    // Verifica si ya existe asistencia para este nivel y fecha
     final dateStr = _formatDate(_selectedDate);
     final existing = await _attendanceRepository.fetchByLevel(token, levelId, dateStr);
 
     if (!mounted) return;
 
-  
     final attendanceMap = <int, String>{};
     if (existing != null && existing.isNotEmpty) {
       for (final a in existing) {
@@ -78,7 +89,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       }
       setState(() => _isEditing = true);
     } else {
-  
       for (final s in students ?? []) {
         attendanceMap[s.studentId] = 'absent';
       }
@@ -117,7 +127,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     final token = await firebaseUser?.getIdToken();
     if (token == null) return;
 
-  
     final me = await _userRepository.fetchUserDetail(token);
     if (me == null) return;
 
@@ -131,7 +140,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     bool success;
 
     if (_isEditing) {
-      // Modifica asistencia existente
       success = await _attendanceRepository.bulkUpdate(
         token,
         _selectedLevel!.id,
@@ -139,7 +147,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         attendances,
       );
     } else {
-      // Crea nueva asistencia
       success = await _attendanceRepository.bulkCreate(
         token,
         _selectedLevel!.id,
@@ -202,7 +209,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-
                 Container(
                   padding: const EdgeInsets.all(16),
                   color: Theme.of(context).colorScheme.primary,
@@ -236,7 +242,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      
+                      // Dropdown de grupos — ya filtrado según rol
                       DropdownButtonFormField<LevelDetail>(
                         value: _selectedLevel,
                         hint: const Text('Seleccionar grupo'),
@@ -285,7 +291,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   itemCount: _students.length,
                                   itemBuilder: (context, index) {
                                     final s = _students[index];
-                                    final status = _attendanceMap[s.studentId] ?? 'present';
+                                    final status = _attendanceMap[s.studentId] ?? 'absent';
 
                                     return Card(
                                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -293,7 +299,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                         child: Row(
                                           children: [
-                                            // Avatar
                                             CircleAvatar(
                                               backgroundColor: _statusColor(status).withOpacity(0.2),
                                               child: Icon(
@@ -303,8 +308,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 12),
-
-                                            // Nombre
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,8 +323,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                                 ],
                                               ),
                                             ),
-
-                                            // Selector de estado
                                             DropdownButton<String>(
                                               value: status,
                                               underline: const SizedBox(),
