@@ -1,4 +1,3 @@
-// models/Level/level_repository.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:stalder/models/Level/level_detail.dart';
@@ -29,7 +28,6 @@ class LevelRepository {
     return response.statusCode == 201;
   }
 
-  // Trae los alumnos de un level
   Future<List<StudentLevel>?> fetchStudentsByLevel(String token, int levelId) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/levels/$levelId/students/'),
@@ -42,7 +40,6 @@ class LevelRepository {
     return null;
   }
 
-  // Agrega un alumno a un level
   Future<bool> addStudentToLevel(String token, int levelId, int studentId) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/levels/$levelId/add_student/'),
@@ -52,7 +49,6 @@ class LevelRepository {
     return response.statusCode == 201;
   }
 
-  // Elimina un alumno de un level
   Future<bool> removeStudentFromLevel(String token, int levelId, int studentId) async {
     final response = await http.delete(
       Uri.parse('$_baseUrl/levels/$levelId/remove_student/'),

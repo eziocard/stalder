@@ -30,17 +30,15 @@ class _InfoScreenState extends State<InfoScreen> {
         body: FutureBuilder<UserDetail?>(
         future: _fetchUserDetail(),
         builder: (context, snapshot) {
-          // Cargando
+  
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Error
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          // Sin datos
           if (!snapshot.hasData || snapshot.data == null) {
             return const Center(child: Text('No se encontraron datos del usuario'));
           }

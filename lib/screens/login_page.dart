@@ -4,7 +4,6 @@ import 'package:stalder/models/Auth/auth.dart';
 import 'package:stalder/screens/components/entryfield.dart';
 
 
-// 👇 CREA ESTA PANTALLA (ejemplo básico)
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

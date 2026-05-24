@@ -10,7 +10,7 @@ import 'package:stalder/screens/dashboard/level/add_level_modal.dart';
 import 'package:stalder/screens/dashboard/level/level_info_screen.dart';
 
 class LevelScreen extends StatefulWidget {
-  final UserDetail? currentUser; // ← recibe el usuario actual
+  final UserDetail? currentUser; 
 
   const LevelScreen({super.key, this.currentUser});
 
@@ -52,7 +52,6 @@ class _LevelScreenState extends State<LevelScreen> {
 
     if (!mounted) return;
 
-    // Si es Coach filtra solo sus niveles
     List<LevelDetail> filteredLevels = levels ?? [];
     if (!_isAdmin && widget.currentUser != null) {
       filteredLevels = filteredLevels.where((l) =>

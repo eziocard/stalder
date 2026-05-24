@@ -9,7 +9,7 @@ import 'package:stalder/models/User/user_detail.dart';
 import 'package:stalder/models/attendance/attendance_repository.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  final UserDetail? currentUser; // ← agrega esto
+  final UserDetail? currentUser; 
 
   const AttendanceScreen({super.key, this.currentUser});
 
@@ -56,7 +56,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     if (!mounted) return;
 
-    // Si es Coach filtra solo sus niveles
     List<LevelDetail> filteredLevels = levels ?? [];
     if (!_isAdmin && widget.currentUser != null) {
       filteredLevels = filteredLevels

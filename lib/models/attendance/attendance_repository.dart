@@ -6,7 +6,7 @@ import 'package:stalder/models/attendance/attendance.dart';
 class AttendanceRepository {
   static const String _baseUrl = "http://10.0.2.2:8000/api";
 
-  // GET /api/attendance/by_level/?level_id=1&date=2026-05-01
+
   Future<List<Attendance>?> fetchByLevel(String token, int levelId, String date) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/attendance/by_level/?level_id=$levelId&date=$date'),
@@ -22,7 +22,6 @@ class AttendanceRepository {
     return null;
   }
 
-  // GET /api/attendance/by_student/?student_id=1
   Future<List<Attendance>?> fetchByStudent(String token, int studentId) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/attendance/by_student/?student_id=$studentId'),
@@ -38,7 +37,7 @@ class AttendanceRepository {
     return null;
   }
 
-  // POST /api/attendance/bulk/
+
   Future<bool> bulkCreate(String token, int levelId, String date, int recordedById, List<Map<String, dynamic>> attendances) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/attendance/bulk/'),
@@ -56,7 +55,7 @@ class AttendanceRepository {
     return response.statusCode == 201;
   }
 
-  // PATCH /api/attendance/bulk_update/
+  
   Future<bool> bulkUpdate(String token, int levelId, String date, List<Map<String, dynamic>> attendances) async {
     final response = await http.patch(
       Uri.parse('$_baseUrl/attendance/bulk_update/'),

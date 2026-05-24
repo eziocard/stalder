@@ -10,7 +10,7 @@ import 'package:stalder/screens/dashboard/level/add_student_modal.dart';
 
 class LevelInfoScreen extends StatefulWidget {
   final LevelDetail level;
-  final UserDetail? currentUser; // ← agrega esto
+  final UserDetail? currentUser; 
 
   const LevelInfoScreen({
     super.key,
@@ -31,7 +31,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   List<UserDetail> _availableStudents = [];
   bool _isLoading = true;
 
-  // ← helper de rol
   bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
 
   @override
@@ -141,7 +140,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Lista de alumnos
+               
                 Expanded(
                   child: _students.isEmpty
                       ? const Center(child: Text('No hay alumnos inscritos'))
@@ -155,8 +154,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                               ),
                               title: Text('${s.studentName} ${s.studentLastname}'),
                               subtitle: Text(s.studentEmail),
-
-                              // ← solo Admin ve el botón de quitar
                               trailing: _isAdmin
                                   ? IconButton(
                                       icon: const Icon(
@@ -183,7 +180,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
               ],
             ),
 
-      // ← solo Admin ve el FAB para agregar alumnos
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
               onPressed: _showAddStudentModal,

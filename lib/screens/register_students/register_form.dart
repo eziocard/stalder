@@ -70,7 +70,7 @@ class _RegisterFormState extends State<RegisterForm> {
         _selectedGender = 'Male';
         _selectedRoleId = null;
       });
-      Navigator.pop(context); // vuelve a la lista y recarga
+      Navigator.pop(context); 
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al crear el usuario')),
@@ -122,7 +122,6 @@ class _RegisterFormState extends State<RegisterForm> {
 
                 const SizedBox(height: 16),
 
-                // Role dropdown - hardcodeado igual que antes
                 DropdownButtonFormField<int>(
                   value: _selectedRoleId,
                   hint: const Text('Elige un rol'),

@@ -80,7 +80,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-            // Admin y Coach pueden pasar asistencia
             if (_isAdmin || _isCoach)
               Padding(
                 padding: const EdgeInsets.all(12),
@@ -95,7 +94,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-            // Admin ve todos los niveles, Coach ve solo los suyos
             if (_isAdmin || _isCoach)
               Padding(
                 padding: const EdgeInsets.all(12),
@@ -112,7 +110,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-            // Logout siempre visible
             Padding(
               padding: const EdgeInsets.all(12),
               child: Boxselector(
