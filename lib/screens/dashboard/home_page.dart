@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(12),
                 child: Boxselector(
                   icon: Icons.people,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: Colors.blue,
                   color: Colors.white,
                   onTap: () => Navigator.push(
                     context,

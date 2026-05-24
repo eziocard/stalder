@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:stalder/themes/app_theme.dart';
 import 'widgets/widget_tree.dart';
-
 
 final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding); 
+
   await Firebase.initializeApp();
+
+  FlutterNativeSplash.remove(); 
   runApp(const MainApp());
 }
 
