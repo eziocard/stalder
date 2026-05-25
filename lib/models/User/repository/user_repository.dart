@@ -79,6 +79,17 @@ class UserRepository {
     );
     return response.statusCode == 201;
   }
+
+  Future<bool> deleteUser(String token, int id) async {
+  final response = await http.delete(
+    Uri.parse('$_baseUrl/users/$id/'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+  return response.statusCode == 204;
+}
 }
 
 class StudentRepository {

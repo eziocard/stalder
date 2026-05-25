@@ -107,13 +107,13 @@ class _RegisterFormState extends State<RegisterForm> {
                     const Text('Género', style: TextStyle(fontWeight: FontWeight.w500)),
                     RadioListTile<String>(
                       title: const Text('Hombre'),
-                      value: 'Male',
+                      value: 'Hombre',
                       groupValue: _selectedGender,
                       onChanged: (value) => setState(() => _selectedGender = value),
                     ),
                     RadioListTile<String>(
                       title: const Text('Mujer'),
-                      value: 'Female',
+                      value: 'Mujer',
                       groupValue: _selectedGender,
                       onChanged: (value) => setState(() => _selectedGender = value),
                     ),

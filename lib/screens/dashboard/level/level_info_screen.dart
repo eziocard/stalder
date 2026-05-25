@@ -10,7 +10,7 @@ import 'package:stalder/screens/dashboard/level/add_student_modal.dart';
 
 class LevelInfoScreen extends StatefulWidget {
   final LevelDetail level;
-  final UserDetail? currentUser; 
+  final UserDetail? currentUser;
 
   const LevelInfoScreen({
     super.key,
@@ -60,6 +60,51 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
     });
   }
 
+  Future<void> _deleteLevel() async {
+    // Pide confirmación
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar grupo'),
+        content: Text('¿Estás seguro de eliminar "${widget.level.name}"?\nSe eliminarán también todos los alumnos inscritos.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final token = await firebaseUser?.getIdToken();
+    if (token == null) return;
+
+    final success = await _levelRepository.deleteLevel(token, widget.level.id);
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Grupo eliminado correctamente')),
+      );
+      Navigator.pop(context, true); // ← vuelve y recarga LevelScreen
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al eliminar el grupo'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   void _showAddStudentModal() {
     showModalBottomSheet(
       context: context,
@@ -97,7 +142,18 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.level.name)),
+      appBar: AppBar(
+        title: Text(widget.level.name),
+        actions: [
+          // ← solo Admin ve el botón de eliminar
+          if (_isAdmin)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              tooltip: 'Eliminar grupo',
+              onPressed: _deleteLevel,
+            ),
+        ],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -140,7 +196,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                 ),
                 const SizedBox(height: 8),
 
-               
                 Expanded(
                   child: _students.isEmpty
                       ? const Center(child: Text('No hay alumnos inscritos'))
@@ -179,7 +234,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                 ),
               ],
             ),
-
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
               onPressed: _showAddStudentModal,

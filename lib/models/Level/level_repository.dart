@@ -57,4 +57,14 @@ class LevelRepository {
     );
     return response.statusCode == 204;
   }
+  Future<bool> deleteLevel(String token, int levelId) async {
+  final response = await http.delete(
+    Uri.parse('$_baseUrl/levels/$levelId/'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+  return response.statusCode == 204;
+}
 }

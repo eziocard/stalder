@@ -62,12 +62,11 @@ class _ManageUserState extends State<ManageUser> {
     }
 
     final result = await _userRepository.updateUser(token, widget.user.id, fields);
-
     if (result != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Estudiante actualizado correctamente')),
+        const SnackBar(content: Text('Usuario actualizado correctamente')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al actualizar')),
@@ -75,12 +74,64 @@ class _ManageUserState extends State<ManageUser> {
     }
   }
 
+  Future<void> _deleteUser() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar usuario'),
+        content: Text('¿Estás seguro de eliminar a "${widget.user.name} ${widget.user.lastname}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    final token = await user?.getIdToken();
+    if (token == null) return;
+
+    final success = await _userRepository.deleteUser(token, widget.user.id);
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario eliminado correctamente')),
+      );
+      Navigator.pop(context, true); // ← vuelve y recarga la lista
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al eliminar el usuario'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Menu de usuarios')),
-     
-      body: Padding(
+      appBar: AppBar(
+        title: const Text('Menu de usuarios'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            tooltip: 'Eliminar usuario',
+            onPressed: _deleteUser,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,15 +150,12 @@ class _ManageUserState extends State<ManageUser> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _updateUser,
-                child: const Text('Cambiar'),
+                child: const Text('Guardar cambios'),
               ),
             ),
           ],
-          
         ),
-        
       ),
-      
     );
   }
 }
