@@ -13,7 +13,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? errorMessage = '';
   bool _isLoading = false;
-
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
@@ -52,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     try {
       if (_controllerEmail.text.isEmpty || _controllerPassword.text.isEmpty) {
-        if (mounted) setState(() { errorMessage = 'Por favor ingresa email y contraseña'; });
+        if (mounted) setState(() => errorMessage = 'Por favor ingresa email y contraseña');
         return;
       }
       await Auth().signInWithEmailAndPassword(
@@ -60,9 +59,9 @@ class _LoginPageState extends State<LoginPage> {
         _controllerPassword.text,
       );
     } on FirebaseAuthException catch (e) {
-      if (mounted) setState(() { errorMessage = _translateError(e.code); }); // ← usa el código no el mensaje
+      if (mounted) setState(() => errorMessage = _translateError(e.code));
     } finally {
-      if (mounted) setState(() { _isLoading = false; });
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -70,45 +69,67 @@ class _LoginPageState extends State<LoginPage> {
     return Text(
       errorMessage == '' ? '' : 'Error: $errorMessage',
       style: const TextStyle(color: Colors.red),
+      textAlign: TextAlign.center,
     );
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-      onPressed: _isLoading ? null : signInWithEmailAndPassword,
-      child: _isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : const Text('Login'),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : signInWithEmailAndPassword,
+        child: _isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Text('Login'),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image.asset(
-              'assets/icon/icon.png',
-              width: 150,
-              height: 150,
-              fit: BoxFit.contain,
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
             ),
-            const SizedBox(height: 16.0),
-            Entryfield(title: 'Email', controller: _controllerEmail),
-            const SizedBox(height: 16.0),
-            Entryfield(title: 'Contraseña', controller: _controllerPassword, isPassword: true),
-            const SizedBox(height: 16.0),
-            _submitButton(),
-            const SizedBox(height: 8.0),
-            _errorMessage(),
-          ],
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  Image.asset(
+                    'assets/icon/icon.png',
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 32.0),
+                  Entryfield(title: 'Email', controller: _controllerEmail),
+                  const SizedBox(height: 16.0),
+                  Entryfield(
+                    title: 'Contraseña',
+                    controller: _controllerPassword,
+                    isPassword: true,
+                  ),
+                  const SizedBox(height: 24.0),
+                  _submitButton(),
+                  const SizedBox(height: 8.0),
+                  _errorMessage(),
+                  const Spacer(),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Auth/auth.dart';
-import 'package:stalder/models/User/repository/user_repository.dart';
-import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/components/boxSelector.dart';
 import 'package:stalder/screens/dashboard/attendance/attendance_screen.dart';
 import 'package:stalder/screens/dashboard/level/level_screen.dart';
@@ -17,56 +16,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final User? firebaseUser = Auth().currentUser;
-  final _userRepository = UserRepository();
-
   int _currentIndex = 0;
-  UserDetail? _currentUser;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCurrentUser();
-  }
-
-  Future<void> _loadCurrentUser() async {
-    final token = await firebaseUser?.getIdToken();
-    if (token == null) return;
-    final user = await _userRepository.fetchUserDetail(token);
-    if (!mounted) return;
-    setState(() {
-      _currentUser = user;
-      _isLoading = false;
-    });
-  }
 
   Future<void> signOut() async {
     await Auth().signOut();
   }
 
-  bool get _isAdmin => _currentUser?.roleName == 'Administrador';
-  bool get _isCoach => _currentUser?.roleName == 'Entrenador';
-
-  late final List<Widget> _screens = [
-    _buildHomeBody(),
-    SettingsScreen(),
-  ];
-
-  Widget _buildHomeBody() {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+  Widget _buildHomeBody(UserProvider userProvider) {
+    final isAdmin = userProvider.isAdmin;
+    final isCoach = userProvider.isCoach;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard')),
       body: SingleChildScrollView(
         child: Column(
           children: [
-   
-            if (_isAdmin)
+            if (isAdmin)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Boxselector(
@@ -79,8 +44,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-
-            if (_isAdmin || _isCoach)
+            if (isAdmin || isCoach)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Boxselector(
@@ -89,12 +53,11 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: Colors.orange,
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => AttendanceScreen(currentUser: _currentUser)),
+                    MaterialPageRoute(builder: (_) => const AttendanceScreen()),
                   ),
                 ),
               ),
-
-            if (_isAdmin || _isCoach)
+            if (isAdmin || isCoach)
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Boxselector(
@@ -103,13 +66,10 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: Colors.green,
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => LevelScreen(currentUser: _currentUser),
-                    ),
+                    MaterialPageRoute(builder: (_) => const LevelScreen()),
                   ),
                 ),
               ),
-
             Padding(
               padding: const EdgeInsets.all(12),
               child: Boxselector(
@@ -127,10 +87,21 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+
+    if (userProvider.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final screens = [
+      _buildHomeBody(userProvider),
+      const SettingsScreen(),
+    ];
+
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

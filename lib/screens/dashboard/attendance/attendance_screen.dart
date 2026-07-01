@@ -1,27 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Level/level_detail.dart';
 import 'package:stalder/models/Level/level_repository.dart';
 import 'package:stalder/models/Role/StudentLevel.dart';
-import 'package:stalder/models/User/repository/user_repository.dart';
-import 'package:stalder/models/User/user_detail.dart';
 import 'package:stalder/models/attendance/attendance_repository.dart';
+import 'package:stalder/providers/user_provider.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  final UserDetail? currentUser; 
-
-  const AttendanceScreen({super.key, this.currentUser});
+  const AttendanceScreen({super.key});
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  final User? firebaseUser = Auth().currentUser;
   final _levelRepository = LevelRepository();
   final _attendanceRepository = AttendanceRepository();
-  final _userRepository = UserRepository();
 
   List<LevelDetail> _levels = [];
   LevelDetail? _selectedLevel;
@@ -33,7 +27,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   bool _isEditing = false;
   DateTime _selectedDate = DateTime.now();
 
-  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
+  bool get _isAdmin => context.read<UserProvider>().isAdmin;
 
   final List<Map<String, dynamic>> _statusOptions = [
     {'value': 'present',   'label': 'Presente',    'color': Colors.green,  'icon': Icons.check_circle},
@@ -49,7 +43,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _loadLevels() async {
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final levels = await _levelRepository.fetchLevels(token);
@@ -57,10 +51,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     if (!mounted) return;
 
     List<LevelDetail> filteredLevels = levels ?? [];
-    if (!_isAdmin && widget.currentUser != null) {
-      filteredLevels = filteredLevels
-          .where((l) => l.teacherId == widget.currentUser!.id)
-          .toList();
+    if (!_isAdmin) {
+      final currentUser = context.read<UserProvider>().userDetail;
+      if (currentUser != null) {
+        filteredLevels = filteredLevels
+            .where((l) => l.teacherId == currentUser.id)
+            .toList();
+      }
     }
 
     setState(() {
@@ -72,7 +69,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> _loadStudents(int levelId) async {
     setState(() => _isLoadingStudents = true);
 
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final students = await _levelRepository.fetchStudentsByLevel(token, levelId);
@@ -123,10 +120,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> _saveAttendance() async {
     if (_selectedLevel == null || _students.isEmpty) return;
 
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
-    final me = await _userRepository.fetchUserDetail(token);
+    final me = context.read<UserProvider>().userDetail;
     if (me == null) return;
 
     setState(() => _isSaving = true);
@@ -213,7 +210,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   color: Theme.of(context).colorScheme.primary,
                   child: Column(
                     children: [
-                      // Fecha
                       InkWell(
                         onTap: _pickDate,
                         borderRadius: BorderRadius.circular(8),
@@ -240,8 +236,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-
-                      // Dropdown de grupos — ya filtrado según rol
                       DropdownButtonFormField<LevelDetail>(
                         value: _selectedLevel,
                         hint: const Text('Seleccionar grupo'),
@@ -267,8 +261,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     ],
                   ),
                 ),
-
-                // Lista de alumnos
                 Expanded(
                   child: _selectedLevel == null
                       ? const Center(
@@ -362,8 +354,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                                   },
                                 ),
                 ),
-
-                // Botón guardar
                 if (_selectedLevel != null && _students.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.all(16),

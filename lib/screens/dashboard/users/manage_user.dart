@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/components/entryfield.dart';
 
 class ManageUser extends StatefulWidget {
@@ -14,7 +14,6 @@ class ManageUser extends StatefulWidget {
 }
 
 class _ManageUserState extends State<ManageUser> {
-  final User? user = Auth().currentUser;
   final _userRepository = UserRepository();
 
   late TextEditingController _nameController;
@@ -44,7 +43,7 @@ class _ManageUserState extends State<ManageUser> {
   }
 
   Future<void> _updateUser() async {
-    final token = await user?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final fields = <String, dynamic>{};
@@ -96,7 +95,7 @@ class _ManageUserState extends State<ManageUser> {
 
     if (confirm != true) return;
 
-    final token = await user?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final success = await _userRepository.deleteUser(token, widget.user.id);
@@ -107,7 +106,7 @@ class _ManageUserState extends State<ManageUser> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Usuario eliminado correctamente')),
       );
-      Navigator.pop(context, true); // ← vuelve y recarga la lista
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

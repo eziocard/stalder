@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Auth/auth.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/dashboard/home_page.dart';
 import 'package:stalder/screens/login_page.dart';
-
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({super.key});
@@ -15,21 +16,28 @@ class WidgetTree extends StatefulWidget {
 class _WidgetTreeState extends State<WidgetTree> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(stream: Auth().authStateChanges, builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.active) {
-        User? user = snapshot.data;
-        if (user == null) {
-          return const LoginPage();
+    return StreamBuilder(
+      stream: Auth().authStateChanges,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          User? user = snapshot.data;
+          if (user == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) context.read<UserProvider>().clear();
+            });
+            return const LoginPage();
+          } else {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) context.read<UserProvider>().loadUser(user);
+            });
+            return const HomePage();
+          }
         } else {
-          return HomePage();
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
-      } else {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-    });
+      },
+    );
   }
 }

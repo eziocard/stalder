@@ -1,25 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Level/level_detail.dart';
 import 'package:stalder/models/Level/level_repository.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/components/cardlevel.dart';
 import 'package:stalder/screens/dashboard/level/add_level_modal.dart';
 import 'package:stalder/screens/dashboard/level/level_info_screen.dart';
 
 class LevelScreen extends StatefulWidget {
-  final UserDetail? currentUser; 
-
-  const LevelScreen({super.key, this.currentUser});
+  const LevelScreen({super.key});
 
   @override
   State<LevelScreen> createState() => _LevelScreenState();
 }
 
 class _LevelScreenState extends State<LevelScreen> {
-  final User? firebaseUser = Auth().currentUser;
   final _levelRepository = LevelRepository();
   final _userRepository = UserRepository();
   final _formKey = GlobalKey<FormState>();
@@ -29,7 +26,7 @@ class _LevelScreenState extends State<LevelScreen> {
   List<UserDetail> _teachers = [];
   bool _isLoading = true;
 
-  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
+  bool get _isAdmin => context.read<UserProvider>().isAdmin;
 
   @override
   void initState() {
@@ -44,7 +41,7 @@ class _LevelScreenState extends State<LevelScreen> {
   }
 
   Future<void> _loadData() async {
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final levels = await _levelRepository.fetchLevels(token);
@@ -53,10 +50,13 @@ class _LevelScreenState extends State<LevelScreen> {
     if (!mounted) return;
 
     List<LevelDetail> filteredLevels = levels ?? [];
-    if (!_isAdmin && widget.currentUser != null) {
-      filteredLevels = filteredLevels.where((l) =>
-        l.teacherId == widget.currentUser!.id
-      ).toList();
+    if (!_isAdmin) {
+      final currentUser = context.read<UserProvider>().userDetail;
+      if (currentUser != null) {
+        filteredLevels = filteredLevels
+            .where((l) => l.teacherId == currentUser.id)
+            .toList();
+      }
     }
 
     setState(() {
@@ -85,6 +85,8 @@ class _LevelScreenState extends State<LevelScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.read<UserProvider>().userDetail;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Manejo de Grupos')),
       body: _isLoading
@@ -100,14 +102,15 @@ class _LevelScreenState extends State<LevelScreen> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => LevelInfoScreen(level: _levels[index],currentUser: widget.currentUser,),
+                          builder: (_) => LevelInfoScreen(
+                            level: _levels[index],
+                            currentUser: currentUser,
+                          ),
                         ),
                       ).then((_) => _loadData()),
                     );
                   },
                 ),
-
-   
       floatingActionButton: _isAdmin
           ? FloatingActionButton(
               onPressed: _showAddLevelModal,

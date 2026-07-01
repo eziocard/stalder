@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Level/level_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/components/entryfield.dart';
 
 class AddLevelModal extends StatefulWidget {
@@ -22,7 +22,6 @@ class AddLevelModal extends StatefulWidget {
 }
 
 class _AddLevelModalState extends State<AddLevelModal> {
-  final User? firebaseUser = Auth().currentUser;
   final _levelRepository = LevelRepository();
 
   UserDetail? _selectedTeacher;
@@ -31,7 +30,7 @@ class _AddLevelModalState extends State<AddLevelModal> {
   Future<void> _submit() async {
     if (!widget.formKey.currentState!.validate()) return;
 
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error de autenticación')),
@@ -51,9 +50,9 @@ class _AddLevelModalState extends State<AddLevelModal> {
     if (success) {
       widget.titleController.clear();
       setState(() => _selectedTeacher = null);
-      Navigator.pop(context, true); 
+      Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('grupo creado correctamente')),
+        const SnackBar(content: Text('Grupo creado correctamente')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +76,6 @@ class _AddLevelModalState extends State<AddLevelModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -92,10 +90,8 @@ class _AddLevelModalState extends State<AddLevelModal> {
               ],
             ),
             const SizedBox(height: 16),
-
             Entryfield(title: 'Nombre del nivel', controller: widget.titleController),
             const SizedBox(height: 16),
-
             DropdownButtonFormField<UserDetail>(
               value: _selectedTeacher,
               hint: const Text('Seleccionar profesor'),
@@ -117,7 +113,6 @@ class _AddLevelModalState extends State<AddLevelModal> {
               },
             ),
             const SizedBox(height: 24),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

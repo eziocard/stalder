@@ -1,11 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Level/level_detail.dart';
 import 'package:stalder/models/Level/level_repository.dart';
 import 'package:stalder/models/Role/StudentLevel.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/dashboard/level/add_student_modal.dart';
 
 class LevelInfoScreen extends StatefulWidget {
@@ -23,7 +23,6 @@ class LevelInfoScreen extends StatefulWidget {
 }
 
 class _LevelInfoScreenState extends State<LevelInfoScreen> {
-  final User? firebaseUser = Auth().currentUser;
   final _levelRepository = LevelRepository();
   final _userRepository = UserRepository();
 
@@ -31,7 +30,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   List<UserDetail> _availableStudents = [];
   bool _isLoading = true;
 
-  bool get _isAdmin => widget.currentUser?.roleName == 'Administrador';
+  bool get _isAdmin => context.read<UserProvider>().isAdmin;
 
   @override
   void initState() {
@@ -40,7 +39,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   }
 
   Future<void> _loadData() async {
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final students = await _levelRepository.fetchStudentsByLevel(token, widget.level.id);
@@ -61,7 +60,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
   }
 
   Future<void> _deleteLevel() async {
-    // Pide confirmación
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -83,7 +81,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
 
     if (confirm != true) return;
 
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
 
     final success = await _levelRepository.deleteLevel(token, widget.level.id);
@@ -94,7 +92,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Grupo eliminado correctamente')),
       );
-      Navigator.pop(context, true); // ← vuelve y recarga LevelScreen
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -115,7 +113,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
       builder: (context) => AddStudentModal(
         students: _availableStudents,
         onAdd: (student) async {
-          final token = await firebaseUser?.getIdToken();
+          final token = await context.read<UserProvider>().getToken();
           if (token == null) return;
           final success = await _levelRepository.addStudentToLevel(
             token,
@@ -145,7 +143,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
       appBar: AppBar(
         title: Text(widget.level.name),
         actions: [
-          // ← solo Admin ve el botón de eliminar
           if (_isAdmin)
             IconButton(
               icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -159,7 +156,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Info del nivel
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.all(16),
@@ -186,7 +182,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                     ],
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
@@ -195,7 +190,6 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-
                 Expanded(
                   child: _students.isEmpty
                       ? const Center(child: Text('No hay alumnos inscritos'))
@@ -216,7 +210,7 @@ class _LevelInfoScreenState extends State<LevelInfoScreen> {
                                         color: Colors.red,
                                       ),
                                       onPressed: () async {
-                                        final token = await firebaseUser?.getIdToken();
+                                        final token = await context.read<UserProvider>().getToken();
                                         if (token == null) return;
                                         final success = await _levelRepository
                                             .removeStudentFromLevel(

@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:stalder/models/attendance/attendance.dart';
 
 class AttendanceRepository {
-  static const String _baseUrl = "http://10.0.2.2:8000/api";
+  static const String _baseUrl = "https://got.rjlopezdiaz.xyz/api";
 
 
   Future<List<Attendance>?> fetchByLevel(String token, int levelId, String date) async {

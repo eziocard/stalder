@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:stalder/models/Auth/auth.dart';
+import 'package:provider/provider.dart';
 import 'package:stalder/models/Role/role.dart';
-
 import 'package:stalder/models/Role/role_repository.dart';
 import 'package:stalder/models/User/repository/user_repository.dart';
 import 'package:stalder/models/User/user_detail.dart';
+import 'package:stalder/providers/user_provider.dart';
 import 'package:stalder/screens/dashboard/users/manage_user.dart';
 import 'package:stalder/screens/register_students/register_form.dart';
 
@@ -17,14 +16,13 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
-  final User? firebaseUser = Auth().currentUser;
   final _userRepository = UserRepository();
   final _roleRepository = RoleRepository();
 
   Future<List<UserDetail>?>? _userFuture;
   List<Role> _roles = [];
   String _searchText = '';
-  int? _selectedRoleId; 
+  int? _selectedRoleId;
 
   @override
   void initState() {
@@ -34,7 +32,7 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   Future<void> _loadRoles() async {
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
     final roles = await _roleRepository.fetchRoles(token);
     setState(() {
@@ -43,7 +41,7 @@ class _UserScreenState extends State<UserScreen> {
   }
 
   Future<void> _loadUsers() async {
-    final token = await firebaseUser?.getIdToken();
+    final token = await context.read<UserProvider>().getToken();
     if (token == null) return;
     setState(() {
       _userFuture = _userRepository.fetchUser(token);
@@ -56,7 +54,6 @@ class _UserScreenState extends State<UserScreen> {
       appBar: AppBar(title: const Text('Información de usuarios')),
       body: Column(
         children: [
-          // Buscador
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
@@ -70,8 +67,6 @@ class _UserScreenState extends State<UserScreen> {
               },
             ),
           ),
-
-          
           if (_roles.isNotEmpty)
             SizedBox(
               height: 44,
@@ -79,7 +74,6 @@ class _UserScreenState extends State<UserScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: FilterChip(
@@ -90,7 +84,6 @@ class _UserScreenState extends State<UserScreen> {
                       },
                     ),
                   ),
-                  // Chip por cada rol
                   ..._roles.map((role) => Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
@@ -108,10 +101,7 @@ class _UserScreenState extends State<UserScreen> {
                 ],
               ),
             ),
-
           const SizedBox(height: 8),
-
-          // Lista de usuarios
           Expanded(
             child: FutureBuilder<List<UserDetail>?>(
               future: _userFuture,
@@ -124,7 +114,6 @@ class _UserScreenState extends State<UserScreen> {
                   return const Center(child: Text('No hay usuarios'));
                 }
 
-                
                 final users = snapshot.data!.where((u) {
                   final matchesSearch =
                       u.name.toLowerCase().contains(_searchText.toLowerCase()) ||

@@ -5,7 +5,7 @@ import 'package:stalder/models/Level/level_detail.dart';
 import 'package:stalder/models/Role/StudentLevel.dart';
 
 class LevelRepository {
-  static const String _baseUrl = "http://10.0.2.2:8000/api";
+  static const String _baseUrl = "https://got.rjlopezdiaz.xyz/api";
 
   Future<List<LevelDetail>?> fetchLevels(String token) async {
     final response = await http.get(

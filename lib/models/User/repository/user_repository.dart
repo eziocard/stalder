@@ -3,23 +3,24 @@ import 'package:stalder/models/User/user_detail.dart';
 import 'package:http/http.dart' as http;
 
 class UserRepository {
-  static const String _baseUrl = "http://10.0.2.2:8000/api";
+  static const String _baseUrl = "https://got.rjlopezdiaz.xyz/api";
 
   Future<UserDetail?> fetchUserDetail(String token) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/users/me/'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode == 200) {
-      var decodedJson = jsonDecode(response.body);
-      return UserDetail.fromJson(decodedJson);
-    }
-    return null;
+  final response = await http.get(
+    Uri.parse('$_baseUrl/users/me/'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+  print('fetchUserDetail status: ${response.statusCode}');
+  print('fetchUserDetail body: ${response.body}');
+  if (response.statusCode == 200) {
+    var decodedJson = jsonDecode(response.body);
+    return UserDetail.fromJson(decodedJson);
   }
-
+  return null;
+}
   Future<List<UserDetail>?> fetchUser(String token) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/users/'),
@@ -93,7 +94,7 @@ class UserRepository {
 }
 
 class StudentRepository {
-  static const String _baseUrl = "http://10.0.2.2:8000/api";
+  static const String _baseUrl = "https://got.rjlopezdiaz.xyz/api";
 
   Future<List<UserDetail>?> fetchStudents(String token) async {
     final response = await http.get(
